@@ -84,7 +84,7 @@ public class LoginActivity extends Activity {
             // OPENED_TOKEN_UPDATED state, the selection fragment should already
             // be showing.
             if (state.equals(SessionState.OPENED)) {
-                startActivity(new Intent(this, MainActivity.class));
+                startActivity(new Intent(this, DareActivity.class));
             }
         }
     }
