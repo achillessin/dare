@@ -1,6 +1,7 @@
 
 package com.dare;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -8,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 
 public class DareActivity extends FragmentActivity {
 
@@ -29,7 +31,13 @@ public class DareActivity extends FragmentActivity {
                 getNavOnClickListener(new ReceivedFragment()));
         findViewById(R.id.btn_settings).setOnClickListener(
                 getNavOnClickListener(new SettingsFragment()));
-
+        Button createButton = (Button) findViewById(R.id.btn_create);
+        createButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(DareActivity.this, CreateActivity.class));
+            }
+        });
     }
 
     private OnClickListener getNavOnClickListener(final Fragment fragment) {
