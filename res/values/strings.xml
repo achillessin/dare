@@ -2,7 +2,13 @@
 <resources>
 
     <string name="app_name">Dare</string>
+     <string name="login">Log In</string>
 
     <!-- FB ID -->
     <string name="app_id">277897082406813</string>
+    
+    <!-- Parse IDS -->
+    <string name="ParseApplicationID">ZAsxKpmPO8OoCrgP0qouwCDOHqrMGv0bdobZIrcI</string>
+    <string name="ParseClientID">iCjkobDvFIBGkW7vmJTBvmuu2TvadgTCMyrdChHD</string>
+
 </resources>

@@ -10,11 +10,15 @@
         android:layout_gravity="center"
         android:padding="50dp"
         android:src="@drawable/logo"/>
-    <com.facebook.widget.LoginButton
-        android:id="@+id/login_button"
+    <Button
+        android:id="@+id/loginButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:layout_margin="100dp"
+        android:text="@string/login"
+        android:textColor="#fff"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp" />
+        android:background="@drawable/button_login"/>
+    
 </LinearLayout>
