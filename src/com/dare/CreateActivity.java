@@ -1,11 +1,19 @@
 
 package com.dare;
 
+import java.util.List;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.TextView;
+
+import com.dare.utils.FacebookUtils;
+import com.facebook.Request.GraphUserListCallback;
+import com.facebook.Response;
+import com.facebook.model.GraphUser;
 
 public class CreateActivity extends Activity {
     @Override
@@ -14,6 +22,23 @@ public class CreateActivity extends Activity {
         setContentView(R.layout.activity_create);
 
         setupButtons();
+
+        loadFriends();
+    }
+
+    private void loadFriends() {
+        final TextView friendsView = (TextView) findViewById(R.id.friends);
+        friendsView.setText("Loading Friends...");
+        FacebookUtils.getFriendList(new GraphUserListCallback() {
+            @Override
+            public void onCompleted(List<GraphUser> users, Response response) {
+                StringBuilder friendsBuilder = new StringBuilder();
+                for (GraphUser user : users) {
+                    friendsBuilder.append(user.getName() + "\n");
+                }
+                friendsView.setText(friendsBuilder.toString());
+            }
+        });
     }
 
     private void setupButtons() {
