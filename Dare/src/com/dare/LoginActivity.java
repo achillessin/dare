@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.facebook.AppEventsLogger;
+import com.facebook.Session;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
@@ -37,16 +38,35 @@ public class LoginActivity extends Activity {
             }
         });
 
-        // Check if there is a currently logged in user
-        // and they are linked to a Facebook account.
-        ParseUser currentUser = ParseUser.getCurrentUser();
-        if ((currentUser != null) && ParseFacebookUtils.isLinked(currentUser)) {
+        if (isLoggedIn()) {
+            mLoginButton.setText(R.string.login);
             // Go to the user info activity
             goToDareActivity();
         }
+
     }
 
-    private void onLoginButtonClicked() {
+    private boolean isLoggedIn() {
+        // Check if there is a currently logged in user
+        // and they are linked to a Facebook account.
+        ParseUser currentUser = ParseUser.getCurrentUser();
+        return (currentUser != null)
+                && ParseFacebookUtils.isLinked(currentUser);
+    }
+
+    private void logout() {
+        mLoginButton.setText(R.string.login);
+        ParseUser.logOut();
+        Session session = Session.getActiveSession();
+        if (session == null) {
+            session = new Session(this);
+            Session.setActiveSession(session);
+        }
+        session.closeAndClearTokenInformation();
+        return;
+    }
+
+    private void login() {
         LoginActivity.this.mProgressDialog = ProgressDialog.show(
                 LoginActivity.this, "", "Logging in...", true);
         List<String> permissions = Arrays.asList("public_profile",
@@ -62,14 +82,25 @@ public class LoginActivity extends Activity {
                 } else if (user.isNew()) {
                     Log.d(DareApplication.TAG,
                             "User signed up and logged in through Facebook!");
+                    mLoginButton.setText(R.string.logout);
                     goToDareActivity();
                 } else {
                     Log.d(DareApplication.TAG,
                             "User logged in through Facebook!");
+                    mLoginButton.setText(R.string.logout);
                     goToDareActivity();
                 }
             }
         });
+    }
+
+    private void onLoginButtonClicked() {
+        if (isLoggedIn()) {
+            logout();
+        } else {
+            login();
+        }
+
     }
 
     private void goToDareActivity() {

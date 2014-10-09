@@ -1,19 +1,17 @@
-
 package com.dare;
-
-import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import com.dare.utils.FacebookUtils;
-import com.facebook.Request.GraphUserListCallback;
-import com.facebook.Response;
-import com.facebook.model.GraphUser;
+import com.facebook.FacebookException;
+import com.facebook.FacebookOperationCanceledException;
+import com.facebook.Session;
+import com.facebook.widget.WebDialog;
+import com.facebook.widget.WebDialog.OnCompleteListener;
 
 public class CreateActivity extends Activity {
     @Override
@@ -23,25 +21,57 @@ public class CreateActivity extends Activity {
 
         setupButtons();
 
-        loadFriends();
     }
 
-    private void loadFriends() {
-        final TextView friendsView = (TextView) findViewById(R.id.friends);
-        friendsView.setText("Loading Friends...");
-        FacebookUtils.getFriendList(new GraphUserListCallback() {
-            @Override
-            public void onCompleted(List<GraphUser> users, Response response) {
-                StringBuilder friendsBuilder = new StringBuilder();
-                for (GraphUser user : users) {
-                    friendsBuilder.append(user.getName() + "\n");
-                }
-                friendsView.setText(friendsBuilder.toString());
-            }
-        });
+    private void sendRequestDialog() {
+        Bundle params = new Bundle();
+        params.putString(
+                "message",
+                "This is a request that should prompt you to get the app and provide a send param");
+        params.putString("send", "a challenge!");
+        WebDialog requestsDialog = (new WebDialog.RequestsDialogBuilder(this,
+                Session.getActiveSession(), params)).setOnCompleteListener(
+                        new OnCompleteListener() {
+                            @Override
+                            public void onComplete(Bundle values,
+                                    FacebookException error) {
+                                if (error != null) {
+                                    if (error instanceof FacebookOperationCanceledException) {
+                                        Toast.makeText(getApplicationContext(),
+                                                "Request cancelled", Toast.LENGTH_SHORT)
+                                                .show();
+                                    } else {
+                                        Toast.makeText(getApplicationContext(),
+                                                "Network Error", Toast.LENGTH_SHORT)
+                                                .show();
+                                    }
+                                } else {
+                                    final String requestId = values
+                                            .getString("request");
+                                    if (requestId != null) {
+                                        Toast.makeText(getApplicationContext(),
+                                                "Request sent", Toast.LENGTH_SHORT)
+                                                .show();
+                                    } else {
+                                        Toast.makeText(getApplicationContext(),
+                                                "Request cancelled", Toast.LENGTH_SHORT)
+                                                .show();
+                                    }
+                                }
+                            }
+                        }).build();
+        requestsDialog.show();
     }
 
     private void setupButtons() {
+        findViewById(R.id.send_request_button).setOnClickListener(
+                new OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        sendRequestDialog();
+                    }
+                });
         findViewById(R.id.btn_cancel).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
