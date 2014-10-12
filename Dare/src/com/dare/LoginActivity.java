@@ -13,7 +13,10 @@ import android.view.View;
 import android.widget.Button;
 
 import com.facebook.AppEventsLogger;
+import com.facebook.Request;
+import com.facebook.Response;
 import com.facebook.Session;
+import com.facebook.model.GraphUser;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
@@ -74,16 +77,28 @@ public class LoginActivity extends Activity {
                 "user_location", "user_friends");
         ParseFacebookUtils.logIn(permissions, this, new LogInCallback() {
             @Override
-            public void done(ParseUser user, ParseException err) {
-                LoginActivity.this.mProgressDialog.dismiss();
+            public void done(final ParseUser user, ParseException err) {
                 if (user == null) {
                     Log.d(DareApplication.TAG,
                             "Uh oh. The user cancelled the Facebook login.");
                 } else if (user.isNew()) {
                     Log.d(DareApplication.TAG,
                             "User signed up and logged in through Facebook!");
-                    mLoginButton.setText(R.string.logout);
-                    goToDareActivity();
+                    Request request = Request.newMeRequest(
+                            ParseFacebookUtils.getSession(),
+                            new Request.GraphUserCallback() {
+
+                                @Override
+                                public void onCompleted(GraphUser guser,
+                                        Response gresponse) {
+                                    LoginActivity.this.mProgressDialog
+                                            .dismiss();
+                                    user.put("facebookID", guser.getId());
+                                    user.saveEventually();
+                                    goToDareActivity();
+                                }
+                            });
+                    request.executeAsync();
                 } else {
                     Log.d(DareApplication.TAG,
                             "User logged in through Facebook!");

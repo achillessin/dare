@@ -1,4 +1,3 @@
-
 package com.dare;
 
 import android.app.Activity;
@@ -37,8 +36,8 @@ public class CreateActivity extends Activity {
     private void sendRequestDialog() {
         Bundle params = getChallengeParams();
         if (params == null) {
-            Toast.makeText(this, "Please fill in challenge title and details", Toast.LENGTH_SHORT)
-                    .show();
+            Toast.makeText(this, "Please fill in challenge title and details",
+                    Toast.LENGTH_SHORT).show();
             return;
         }
         WebDialog requestsDialog = (new WebDialog.RequestsDialogBuilder(this,
@@ -76,10 +75,10 @@ public class CreateActivity extends Activity {
     }
 
     private Bundle getChallengeParams() {
-        String challengeTitle = ((EditText) findViewById(R.id.challenge_title)).getText()
-                .toString();
-        String challengeContent = ((EditText) findViewById(R.id.challenge_content)).getText()
-                .toString();
+        String challengeTitle = ((EditText) findViewById(R.id.challenge_title))
+                .getText().toString();
+        String challengeContent = ((EditText) findViewById(R.id.challenge_content))
+                .getText().toString();
         if (challengeTitle.isEmpty() || challengeContent.isEmpty()) {
             return null;
         }
