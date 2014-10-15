@@ -1,4 +1,4 @@
-package com.dare.model;
+package com.team.dare.model;
 
 import com.parse.ParseException;
 

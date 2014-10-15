@@ -1,14 +1,15 @@
-package com.dare;
+
+package com.team.dare;
 
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.dare.model.Challenge;
 import com.facebook.widget.ProfilePictureView;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
+import com.team.dare.model.Challenge;
 
 public class CustomTimelineAdapter extends ParseQueryAdapter<Challenge> {
     public CustomTimelineAdapter(Context context, final ParseQuery<Challenge> q) {

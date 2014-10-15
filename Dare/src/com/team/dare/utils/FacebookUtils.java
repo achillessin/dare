@@ -1,5 +1,5 @@
 
-package com.dare.utils;
+package com.team.dare.utils;
 
 import com.facebook.Request;
 import com.parse.ParseFacebookUtils;

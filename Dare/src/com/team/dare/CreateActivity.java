@@ -1,4 +1,5 @@
-package com.dare;
+
+package com.team.dare;
 
 import android.app.Activity;
 import android.content.Intent;

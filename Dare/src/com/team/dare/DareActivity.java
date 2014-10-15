@@ -1,5 +1,5 @@
 
-package com.dare;
+package com.team.dare;
 
 import android.content.Intent;
 import android.os.Bundle;

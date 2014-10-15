@@ -1,4 +1,5 @@
-package com.dare;
+
+package com.team.dare;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.dare.model.Challenge;
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.model.GraphUser;
@@ -18,6 +18,7 @@ import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.team.dare.model.Challenge;
 
 public class TimelineFragment extends Fragment {
 

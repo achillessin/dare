@@ -1,4 +1,5 @@
-package com.dare;
+
+package com.team.dare;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,5 +1,5 @@
 
-package com.dare;
+package com.team.dare;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

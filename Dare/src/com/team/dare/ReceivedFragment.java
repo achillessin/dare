@@ -1,4 +1,5 @@
-package com.dare;
+
+package com.team.dare;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -7,26 +8,26 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.dare.model.Challenge;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.team.dare.model.Challenge;
 
-public class SentFragment extends Fragment {
+public class ReceivedFragment extends Fragment {
 
-    private static final String TAG = "SentFragment";
+    private static final String TAG = "ReceivedFragment";
     private ParseUser mCurrentuser;
     private ListView mListView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.layout_sent, null);
+        return inflater.inflate(R.layout.layout_received, null);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mListView = (ListView) getView().findViewById(R.id.listViewSent);
+        mListView = (ListView) getView().findViewById(R.id.listViewReceived);
         // load the parse user
         mCurrentuser = ParseUser.getCurrentUser();
         // get all challenges created by user
@@ -41,7 +42,7 @@ public class SentFragment extends Fragment {
     public void createChallengeTimeline() {
         // create a custom adapter for the list
         ParseQuery<Challenge> query = new ParseQuery<Challenge>("Challenge");
-        query.whereEqualTo("UserFrom", mCurrentuser);
+        query.whereEqualTo("UserTo", mCurrentuser);
         CustomTimelineAdapter adapter = new CustomTimelineAdapter(
                 getActivity(), query);
         // get list view and add adapter to it.
