@@ -9,7 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
+import android.widget.ImageView;
 
 public class DareActivity extends FragmentActivity {
 
@@ -23,21 +23,18 @@ public class DareActivity extends FragmentActivity {
     }
 
     private void setupNavButtons() {
-        findViewById(R.id.btn_timeline).setOnClickListener(
-                getNavOnClickListener(new TimelineFragment()));
-        findViewById(R.id.btn_sent).setOnClickListener(
-                getNavOnClickListener(new SentFragment()));
-        findViewById(R.id.btn_received).setOnClickListener(
-                getNavOnClickListener(new ReceivedFragment()));
-        findViewById(R.id.btn_settings).setOnClickListener(
-                getNavOnClickListener(new SettingsFragment()));
-        Button createButton = (Button) findViewById(R.id.btn_create);
+        ImageView createButton = (ImageView) findViewById(R.id.btn_create);
+        ImageView homeButton = (ImageView) findViewById(R.id.btn_home);
+        ImageView profileButton = (ImageView) findViewById(R.id.btn_profile);
         createButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(DareActivity.this, CreateActivity.class));
             }
         });
+
+        homeButton.setOnClickListener(getNavOnClickListener(new TimelineFragment()));
+        profileButton.setOnClickListener(getNavOnClickListener(new ProfileFragment()));
     }
 
     private OnClickListener getNavOnClickListener(final Fragment fragment) {
