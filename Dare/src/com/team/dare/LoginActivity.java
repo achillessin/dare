@@ -1,4 +1,3 @@
-
 package com.team.dare;
 
 import java.util.Arrays;
@@ -47,7 +46,6 @@ public class LoginActivity extends Activity {
             // Go to the user info activity
             goToDareActivity();
         }
-
     }
 
     private boolean isLoggedIn() {

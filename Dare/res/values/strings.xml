@@ -4,7 +4,7 @@
     <string name="app_name">Dare</string>
     <string name="login">Log In</string>
     <string name="logout">Log Out</string>
-    <string name="send_request">Select Friends</string>
+    <string name="send_request">Done</string>
 
     <!-- FB ID -->
     <string name="app_id">277897082406813</string>

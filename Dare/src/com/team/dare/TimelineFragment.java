@@ -1,4 +1,3 @@
-
 package com.team.dare;
 
 import java.util.ArrayList;
@@ -51,9 +50,12 @@ public class TimelineFragment extends Fragment {
     }
 
     private void setupFilterButtons(View view) {
-        final TextView all = (TextView) view.findViewById(R.id.timeline_showall);
-        final TextView received = (TextView) view.findViewById(R.id.timeline_showreceived);
-        final TextView sent = (TextView) view.findViewById(R.id.timeline_showsent);
+        final TextView all = (TextView) view
+                .findViewById(R.id.timeline_showall);
+        final TextView received = (TextView) view
+                .findViewById(R.id.timeline_showreceived);
+        final TextView sent = (TextView) view
+                .findViewById(R.id.timeline_showsent);
         OnClickListener filterClickListener = new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -63,12 +65,10 @@ public class TimelineFragment extends Fragment {
                 if (view.equals(all)) {
                     filterState = Filter.ALL;
                     all.setTextColor(Color.RED);
-                }
-                else if (view.equals(received)) {
+                } else if (view.equals(received)) {
                     filterState = Filter.RECEIVED;
                     received.setTextColor(Color.RED);
-                }
-                else if (view.equals(sent)) {
+                } else if (view.equals(sent)) {
                     filterState = Filter.SENT;
                     sent.setTextColor(Color.RED);
                 }
@@ -83,17 +83,26 @@ public class TimelineFragment extends Fragment {
 
     private void updateChallenges() {
         switch (filterState) {
-            case ALL:
-                populateFriendsTimeline();
-                break;
-            case RECEIVED:
-                populateWithQuery(new ParseQuery<Challenge>("Challenge").whereEqualTo("UserTo",
-                        mCurrentuser));
-                break;
-            case SENT:
-                populateWithQuery(new ParseQuery<Challenge>("Challenge").whereEqualTo("UserFrom",
-                        mCurrentuser));
-                break;
+        ParseQuery<Challenge> query;
+        case ALL:
+            populateFriendsTimeline();
+            break;
+        case RECEIVED:
+            query = new ParseQuery<Challenge>(
+                    Challenge.class);
+            query.include("UserTo");
+            query.include("UserFrom");
+            query.whereEqualTo("UserTo", mCurrentuser);
+            populateWithQuery(query);
+            break;
+        case SENT:
+            query = new ParseQuery<Challenge>(
+                    Challenge.class);
+            query.include("UserTo");
+            query.include("UserFrom");
+            query.whereEqualTo("UserFrom", mCurrentuser);
+            populateWithQuery(query);
+            break;
         }
     }
 
@@ -107,7 +116,7 @@ public class TimelineFragment extends Fragment {
         Request req = Request.newMyFriendsRequest(
                 ParseFacebookUtils.getSession(),
                 new Request.GraphUserListCallback() {
-
+                    // TODO: in query add currentUser also.
                     @Override
                     public void onCompleted(List<GraphUser> users,
                             Response response) {
@@ -135,7 +144,8 @@ public class TimelineFragment extends Fragment {
                                 // where
                                 // users are friends
                                 populateWithQuery(new ParseQuery<Challenge>(
-                                        "Challenge").whereContainedIn("UserFrom", friendUsers));
+                                        "Challenge").whereContainedIn(
+                                        "UserFrom", friendUsers));
                             } catch (ParseException e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();

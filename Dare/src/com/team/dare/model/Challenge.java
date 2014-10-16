@@ -83,6 +83,14 @@ public class Challenge extends ParseObject {
         put("ChallengeText", text);
     }
 
+    public String getChallengeTitle() {
+        return getString("ChallengeTitle");
+    }
+
+    public void setChallengeTitle(String text) {
+        put("ChallengeTitle", text);
+    }
+
     public void saveFileToServerHelper(byte[] fileData, FILE_TYPE type,
             final FileLoadSaveListener listener) {
         ParseFile file = null;
