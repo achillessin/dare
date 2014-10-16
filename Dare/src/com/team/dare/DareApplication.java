@@ -6,6 +6,7 @@ import com.parse.Parse;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseObject;
 import com.team.dare.model.Challenge;
+import com.team.dare.model.Like;
 
 public class DareApplication extends Application {
     static final String TAG = "DareApplication";
@@ -19,6 +20,7 @@ public class DareApplication extends Application {
 
         // /register all subclasses
         ParseObject.registerSubclass(Challenge.class);
+        ParseObject.registerSubclass(Like.class);
         // TODO: add app permissions here
         ParseFacebookUtils.initialize(getString(R.string.app_id));
 
