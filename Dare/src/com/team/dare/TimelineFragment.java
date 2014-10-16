@@ -82,22 +82,20 @@ public class TimelineFragment extends Fragment {
     }
 
     private void updateChallenges() {
-        switch (filterState) {
         ParseQuery<Challenge> query;
+        switch (filterState) {
         case ALL:
             populateFriendsTimeline();
             break;
         case RECEIVED:
-            query = new ParseQuery<Challenge>(
-                    Challenge.class);
+            query = new ParseQuery<Challenge>(Challenge.class);
             query.include("UserTo");
             query.include("UserFrom");
             query.whereEqualTo("UserTo", mCurrentuser);
             populateWithQuery(query);
             break;
         case SENT:
-            query = new ParseQuery<Challenge>(
-                    Challenge.class);
+            query = new ParseQuery<Challenge>(Challenge.class);
             query.include("UserTo");
             query.include("UserFrom");
             query.whereEqualTo("UserFrom", mCurrentuser);
@@ -140,12 +138,30 @@ public class TimelineFragment extends Fragment {
                             try {
                                 List<ParseUser> friendUsers = friendQuery
                                         .find();
+                                // ADD CURRENT USER ALSO
+                                friendUsers.add(mCurrentuser);
                                 // another query for finding challenge objects
                                 // where
                                 // users are friends
-                                populateWithQuery(new ParseQuery<Challenge>(
-                                        "Challenge").whereContainedIn(
-                                        "UserFrom", friendUsers));
+                                // query UserFrom
+                                ParseQuery<Challenge> queryUserFrom = new ParseQuery<Challenge>(
+                                        "Challenge");
+                                queryUserFrom.whereContainedIn("UserFrom",
+                                        friendUsers);
+                                // query Userto
+                                ParseQuery<Challenge> queryUserTo = new ParseQuery<Challenge>(
+                                        "Challenge");
+                                queryUserTo.whereContainedIn("UserTo",
+                                        friendUsers);
+                                // main query
+                                List<ParseQuery<Challenge>> queries = new ArrayList<ParseQuery<Challenge>>();
+                                queries.add(queryUserTo);
+                                queries.add(queryUserFrom);
+                                ParseQuery<Challenge> query = ParseQuery
+                                        .or(queries);
+                                query.include("UserFrom");
+                                query.include("UserTo");
+                                populateWithQuery(query);
                             } catch (ParseException e) {
                                 // TODO Auto-generated catch block
                                 e.printStackTrace();
