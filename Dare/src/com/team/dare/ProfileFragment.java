@@ -11,10 +11,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.facebook.Request;
+import com.facebook.Response;
 import com.facebook.Session;
+import com.facebook.model.GraphUser;
 import com.facebook.widget.ProfilePictureView;
 import com.parse.CountCallback;
 import com.parse.ParseException;
+import com.parse.ParseFacebookUtils;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.team.dare.model.Challenge;
@@ -32,7 +36,7 @@ public class ProfileFragment extends Fragment {
         // setup sent challenge score
         setUpSentChallengesScore(view);
         // setup profile picture
-        setupProfilePicture(view);
+        setupProfile(view);
         // setup buttons
         setupButtons(view);
         return view;
@@ -49,11 +53,24 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private void setupProfilePicture(View rootView) {
-        ProfilePictureView imageview = (ProfilePictureView) rootView
+    private void setupProfile(View rootView) {
+        final ProfilePictureView imageview = (ProfilePictureView) rootView
                 .findViewById(R.id.imageviewProfilePicture);
         imageview.setProfileId(ParseUser.getCurrentUser().getString(
                 "facebookID"));
+        final TextView profileName = (TextView) rootView
+                .findViewById(R.id.textviewName);
+        Request req = Request.newMeRequest(ParseFacebookUtils.getSession(),
+                new Request.GraphUserCallback() {
+
+                    @Override
+                    public void onCompleted(GraphUser user, Response response) {
+                        if (user != null) {
+                            profileName.setText(user.getName().toString());
+                        }
+                    }
+                });
+        req.executeAsync();
     }
 
     private void setUpRecvChallengesScore(View rootView) {
