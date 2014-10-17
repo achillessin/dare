@@ -141,29 +141,20 @@ public class TimelineFragment extends Fragment {
                                 // ADD CURRENT USER ALSO
                                 friendUsers.add(mCurrentuser);
                                 // another query for finding challenge objects
-                                // where
-                                // users are friends
-                                // query UserFrom
-                                ParseQuery<Challenge> queryUserFrom = new ParseQuery<Challenge>(
-                                        "Challenge");
-                                queryUserFrom.whereContainedIn("UserFrom",
-                                        friendUsers);
-                                // query Userto
-                                ParseQuery<Challenge> queryUserTo = new ParseQuery<Challenge>(
-                                        "Challenge");
-                                queryUserTo.whereContainedIn("UserTo",
-                                        friendUsers);
-                                // main query
+                                // where users are friends
                                 List<ParseQuery<Challenge>> queries = new ArrayList<ParseQuery<Challenge>>();
-                                queries.add(queryUserTo);
-                                queries.add(queryUserFrom);
+                                queries.add(new ParseQuery<Challenge>(
+                                        "Challenge").whereContainedIn("UserTo",
+                                        friendUsers));
+                                queries.add(new ParseQuery<Challenge>(
+                                        "Challenge").whereContainedIn(
+                                        "UserFrom", friendUsers));
                                 ParseQuery<Challenge> query = ParseQuery
                                         .or(queries);
                                 query.include("UserFrom");
                                 query.include("UserTo");
                                 populateWithQuery(query);
                             } catch (ParseException e) {
-                                // TODO Auto-generated catch block
                                 e.printStackTrace();
                             }
                         }
