@@ -1,4 +1,3 @@
-
 package com.team.dare;
 
 import java.util.ArrayList;
@@ -106,8 +105,7 @@ public class TimelineFragment extends Fragment {
     private CustomTimelineAdapter getAllAdapter() {
         ParseQuery<Challenge> queryUserTo = new ParseQuery<Challenge>(
                 "Challenge");
-        queryUserTo.whereEqualTo("UserTo",
-                mAllUsers.get(1));
+        queryUserTo.whereEqualTo("UserTo", mAllUsers.get(2));
         queryUserTo.include("UserFrom");
         queryUserTo.include("UserTo");
         return new CustomTimelineAdapter(getActivity(), queryUserTo);
@@ -134,7 +132,8 @@ public class TimelineFragment extends Fragment {
     }
 
     private CustomTimelineAdapter getReceivedAdapter() {
-        ParseQuery<Challenge> receivedQuery = new ParseQuery<Challenge>(Challenge.class);
+        ParseQuery<Challenge> receivedQuery = new ParseQuery<Challenge>(
+                Challenge.class);
         receivedQuery.include("UserTo");
         receivedQuery.include("UserFrom");
         receivedQuery.whereEqualTo("UserTo", mCurrentuser);
@@ -142,7 +141,8 @@ public class TimelineFragment extends Fragment {
     }
 
     private CustomTimelineAdapter getSentAdapter() {
-        ParseQuery<Challenge> sentQuery = new ParseQuery<Challenge>(Challenge.class);
+        ParseQuery<Challenge> sentQuery = new ParseQuery<Challenge>(
+                Challenge.class);
         sentQuery.include("UserTo");
         sentQuery.include("UserFrom");
         sentQuery.whereEqualTo("UserFrom", mCurrentuser);
@@ -153,18 +153,18 @@ public class TimelineFragment extends Fragment {
         Log.e("androidruntime", "updatechallenges");
         CustomTimelineAdapter adapter = null;
         switch (mFilterState) {
-            case ALL:
-                // mAllQuery doesn't exist until friends query is finished
-                if (mAllUsers != null) {
-                    adapter = getAllAdapter();
-                }
-                break;
-            case RECEIVED:
-                adapter = getReceivedAdapter();
-                break;
-            case SENT:
-                adapter = getSentAdapter();
-                break;
+        case ALL:
+            // mAllQuery doesn't exist until friends query is finished
+            if (mAllUsers != null) {
+                adapter = getAllAdapter();
+            }
+            break;
+        case RECEIVED:
+            adapter = getReceivedAdapter();
+            break;
+        case SENT:
+            adapter = getSentAdapter();
+            break;
         }
         if (adapter != null) {
             adapter.addOnQueryLoadListener(new OnQueryLoadListener<Challenge>() {

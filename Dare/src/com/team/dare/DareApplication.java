@@ -1,4 +1,3 @@
-
 package com.team.dare;
 
 import android.app.Application;
@@ -9,6 +8,7 @@ import com.parse.ParseObject;
 import com.team.dare.model.Challenge;
 import com.team.dare.model.Comment;
 import com.team.dare.model.Like;
+import com.team.dare.model.ResponseMedia;
 
 public class DareApplication extends Application {
     static final String TAG = "DareApplication";
@@ -24,6 +24,7 @@ public class DareApplication extends Application {
         ParseObject.registerSubclass(Challenge.class);
         ParseObject.registerSubclass(Like.class);
         ParseObject.registerSubclass(Comment.class);
+        ParseObject.registerSubclass(ResponseMedia.class);
         // TODO: add app permissions here
         ParseFacebookUtils.initialize(getString(R.string.app_id));
 
