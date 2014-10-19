@@ -12,6 +12,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:textSize="20sp"
             android:text="All"/>
         <TextView
             android:id="@+id/timeline_showreceived"
@@ -19,6 +20,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:textSize="20sp"
             android:text="Received"/>
         <TextView
             android:id="@+id/timeline_showsent"
@@ -26,11 +28,12 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
+            android:textSize="20sp"
             android:text="Sent"/>
     </LinearLayout>
-    <ListView 
-        android:id="@+id/listViewTimeline"
+    <FrameLayout 
+        android:id="@+id/list_frame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
-    </ListView>
+    </FrameLayout>
 </LinearLayout>

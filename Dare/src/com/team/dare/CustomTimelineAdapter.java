@@ -1,34 +1,49 @@
+
 package com.team.dare;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.facebook.widget.ProfilePictureView;
+import com.parse.CountCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
 import com.parse.ParseUser;
 import com.team.dare.model.Challenge;
+import com.team.dare.model.Comment;
 import com.team.dare.model.Like;
 
 public class CustomTimelineAdapter extends ParseQueryAdapter<Challenge> {
 
+    private ParseQuery<Challenge> mQuery;
+
+    private final Map<Challenge, View> challengeLayouts = new HashMap<Challenge, View>();
+
     public CustomTimelineAdapter(Context context, final ParseQuery<Challenge> q) {
         super(context, new ParseQueryAdapter.QueryFactory<Challenge>() {
-
             @Override
             public ParseQuery<Challenge> create() {
-                ParseQuery<Challenge> query = q;
-                return query;
+                return q;
             }
         });
+        mQuery = q;
+    }
+
+    public ParseQuery<Challenge> getQuery() {
+        return mQuery;
     }
 
     @Override
@@ -37,6 +52,7 @@ public class CustomTimelineAdapter extends ParseQueryAdapter<Challenge> {
             layout = View.inflate(getContext(),
                     R.layout.layout_challenge_card_content_footer, null);
         }
+        challengeLayouts.put(challenge, layout);
         try {
             challenge.fetchIfNeeded();
         } catch (ParseException e) {
@@ -62,26 +78,27 @@ public class CustomTimelineAdapter extends ParseQueryAdapter<Challenge> {
                 .findViewById(R.id.textviewTitle);
         challengeTitleView.setText(challenge.getChallengeTitle().toString());
 
-        setLikesAndComments(challenge, layout);
-        setupLikeAndCommentButtons(challenge, layout);
+        showLikes(challenge);
+        showComments(challenge);
+        setupLikeButton(challenge);
+        setupCommentButton(challenge);
         return layout;
     }
 
-    private void setLikesAndComments(Challenge challenge, final View layout) {
-        // TODO only does likes right now
-        final Button likeButton = (Button) layout
-                .findViewById(R.id.button_like);
+    private void showLikes(final Challenge challenge) {
         // get all likes for this challenge
         Like.getChallengeLikes(challenge, new FindCallback<Like>() {
             @Override
             public void done(List<Like> likes, ParseException e) {
+                View layout = challengeLayouts.get(challenge);
+                Button likeButton = (Button) layout.findViewById(R.id.button_like);
+                TextView likesView = (TextView) layout.findViewById(R.id.num_likes);
                 // show number of likes
-                showNumLikes((TextView) layout.findViewById(R.id.num_likes),
-                        likes.size());
+                showNumFeedback(likesView, likes.size(), "like");
                 // set like button action
                 likeButton.setText(R.string.like);
                 for (Like like : likes) {
-                    if (like.getUser().equals(ParseUser.getCurrentUser())) {
+                    if (like.getUser().hasSameId(ParseUser.getCurrentUser())) {
                         likeButton.setText(R.string.unlike);
                         break;
                     }
@@ -90,9 +107,21 @@ public class CustomTimelineAdapter extends ParseQueryAdapter<Challenge> {
         });
     }
 
-    private void setupLikeAndCommentButtons(final Challenge challenge,
-            final View layout) {
-        // TODO only does likes right now
+    private void showComments(final Challenge challenge) {
+        // get all comments for this challenge
+        Comment.getNumChallengeComments(challenge, new CountCallback() {
+            @Override
+            public void done(int count, ParseException e) {
+                View layout = challengeLayouts.get(challenge);
+                TextView numCommentsView = (TextView) layout
+                        .findViewById(R.id.num_comments);
+                showNumFeedback(numCommentsView, count, "comment");
+            }
+        });
+    }
+
+    private void setupLikeButton(final Challenge challenge) {
+        View layout = challengeLayouts.get(challenge);
         final Button likeButton = (Button) layout
                 .findViewById(R.id.button_like);
         final TextView likesView = (TextView) layout
@@ -107,35 +136,71 @@ public class CustomTimelineAdapter extends ParseQueryAdapter<Challenge> {
                         likeButton.getContext().getString(R.string.like))) {
                     Like.likeChallenge(challenge);
                     likeButton.setText(R.string.unlike);
-                    stepLike(likesView, true);
+                    stepNumFeedback(likesView, "like", true);
                 } else {
                     Like.unlikeChallenge(challenge);
                     likeButton.setText(R.string.like);
-                    stepLike(likesView, false);
+                    stepNumFeedback(likesView, "like", false);
                 }
             }
         });
     }
 
-    private void showNumLikes(TextView numLikesText, int numLikes) {
-        if (numLikes > 0) {
-            numLikesText.setText(Integer.toString(numLikes) + " like"
-                    + (numLikes > 1 ? "s" : ""));
+    private void setupCommentButton(final Challenge challenge) {
+        View layout = challengeLayouts.get(challenge);
+        final Button commentButton = (Button) layout
+                .findViewById(R.id.button_comment);
+        commentButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View button) {
+                promptComment(challenge);
+            }
+        });
+    }
+
+    private void promptComment(final Challenge challenge) {
+        View layout = challengeLayouts.get(challenge);
+        final TextView commentView = (TextView) layout
+                .findViewById(R.id.num_comments);
+        AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+        alert.setTitle("Add a Comment");
+        // Set an EditText view to get user input
+        final EditText input = new EditText(getContext());
+        alert.setView(input);
+        alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int whichButton) {
+                String commentText = input.getText().toString();
+                if (commentText.isEmpty()) {
+                    return;
+                }
+                Comment.addComment(challenge, commentText);
+                stepNumFeedback(commentView, "comment", true);
+            }
+        });
+        alert.setNegativeButton("Cancel", null);
+        alert.show();
+    }
+
+    private void showNumFeedback(TextView text, int num, String feedback) {
+        if (num > 0) {
+            text.setText(Integer.toString(num) + " " + feedback
+                    + (num > 1 ? "s" : ""));
         } else {
-            numLikesText.setText("");
+            text.setText("");
         }
     }
 
-    private void stepLike(TextView numLikesText, boolean up) {
-        String currString = numLikesText.getText().toString();
-        int currLikes = 0;
-        int startLike = currString.indexOf("like");
-        if (startLike > 0) {
-            currLikes = Integer
-                    .parseInt(currString.substring(0, startLike - 1));
+    private void stepNumFeedback(TextView text, String feedback, boolean up) {
+        String currString = text.getText().toString();
+        int curr = 0;
+        int startFeedback = currString.indexOf(feedback);
+        if (startFeedback > 0) {
+            curr = Integer
+                    .parseInt(currString.substring(0, startFeedback - 1));
         }
-        int newLikes = currLikes + (up ? 1 : -1);
-        newLikes = Math.max(newLikes, 0);
-        showNumLikes(numLikesText, newLikes);
+        int newVal = curr + (up ? 1 : -1);
+        newVal = Math.max(newVal, 0);
+        showNumFeedback(text, newVal, feedback);
     }
 }

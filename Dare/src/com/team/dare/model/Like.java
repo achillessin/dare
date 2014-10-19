@@ -1,3 +1,4 @@
+
 package com.team.dare.model;
 
 import java.util.List;
