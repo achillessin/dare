@@ -88,23 +88,60 @@ public class ChallengeExpandedActivity extends Activity {
 
     // load the challenge card response - whether accepted,declined, media if
     // uploaded, or option to respond
-    private void loadChallengeCardResponse(Challenge c) {
+    private void loadChallengeCardResponse(final Challenge c) {
         // if userTo == currentuser
         if (c.getUserTo().getObjectId() == ParseUser.getCurrentUser()
                 .getObjectId()) {
             // if challenge not accepted yet
-            if (!c.getIsAccepted()) {
+            if (c.getResponseStatus() == Challenge.RESPONSE_STATUS.UNKNOWN) {
                 // show accept/decline buttons
                 enableLayout(R.id.linearlayoutAcceptDecline);
-            } else {
-                enableLayout(R.id.linearlayoutResponseContent);
+                findViewById(R.id.buttonAccept).setOnClickListener(
+                        new OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                c.setResponseStatus(Challenge.RESPONSE_STATUS.ACCEPTED);
+                                c.saveEventually();
+                                loadChallengeCardResponse(c);
+                            }
+                        });
+                findViewById(R.id.buttonDecline).setOnClickListener(
+                        new OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                c.setResponseStatus(Challenge.RESPONSE_STATUS.DECLINED);
+                                c.saveEventually();
+                                loadChallengeCardResponse(c);
+                            }
+                        });
+            } else if (c.getResponseStatus() == Challenge.RESPONSE_STATUS.ACCEPTED) {
+                // show accepted sign, and content if any
+                enableLayout(R.id.linearlayoutResponse);
+                ((TextView) findViewById(R.id.textviewResponseMessage))
+                        .setText("Accepted");
+            } else if (c.getResponseStatus() == Challenge.RESPONSE_STATUS.DECLINED) {
+                // show declined message
+                enableLayout(R.id.linearlayoutResponse);
+                ((TextView) findViewById(R.id.textviewResponseMessage))
+                        .setText("Declined");
             }
         } else {
             // current user cannot respond
-            if (!c.getIsAccepted()) {
-                enableLayout(R.id.linearlayoutAwaitingResponse);
-            } else {
-                enableLayout(R.id.linearlayoutResponseContent);
+            if (c.getResponseStatus() == Challenge.RESPONSE_STATUS.UNKNOWN) {
+                // show awaiting reponse
+                enableLayout(R.id.linearlayoutResponse);
+                ((TextView) findViewById(R.id.textviewResponseMessage))
+                        .setText("Awaiting Response");
+            } else if (c.getResponseStatus() == Challenge.RESPONSE_STATUS.ACCEPTED) {
+                // show accepted response
+                enableLayout(R.id.linearlayoutResponse);
+                ((TextView) findViewById(R.id.textviewResponseMessage))
+                        .setText("Accepted");
+            } else if (c.getResponseStatus() == Challenge.RESPONSE_STATUS.DECLINED) {
+                // show declined message
+                enableLayout(R.id.linearlayoutResponse);
+                ((TextView) findViewById(R.id.textviewResponseMessage))
+                        .setText("Declined");
             }
         }
     }
@@ -114,27 +151,8 @@ public class ChallengeExpandedActivity extends Activity {
     private void enableLayout(int layoutID) {
         // disable all layouts
         findViewById(R.id.linearlayoutAcceptDecline).setVisibility(View.GONE);
-        findViewById(R.id.linearlayoutAwaitingResponse)
-                .setVisibility(View.GONE);
-        findViewById(R.id.linearlayoutResponseContent).setVisibility(View.GONE);
-        // enable the layout and set it up
-        switch (layoutID) {
-        case R.id.linearlayoutAcceptDecline:
-            findViewById(R.id.linearlayoutAcceptDecline).setVisibility(
-                    View.VISIBLE);
-            // set up buttons - acceept/decline
-            break;
-        case R.id.linearlayoutAwaitingResponse:
-            findViewById(R.id.linearlayoutAwaitingResponse).setVisibility(
-                    View.VISIBLE);
-            break;
-        case R.id.linearlayoutResponseContent:
-            findViewById(R.id.linearlayoutResponseContent).setVisibility(
-                    View.VISIBLE);
-            // set up textview: accepted or declined
-            // set up media files/text if any
-            break;
-        }
+        findViewById(R.id.linearlayoutResponse).setVisibility(View.GONE);
+        findViewById(layoutID).setVisibility(View.VISIBLE);
     }
 
     private void showLikes(final Challenge challenge) {

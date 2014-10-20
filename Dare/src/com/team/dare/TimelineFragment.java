@@ -201,7 +201,7 @@ public class TimelineFragment extends Fragment {
                             ChallengeExpandedActivity.class);
                     intent.putExtra(ChallengeExpandedActivity.KEY_CHALLENGE_ID,
                             c.getObjectId());
-                    startActivity(intent);
+                    getActivity().startActivity(intent);
                 }
             });
 

@@ -9,6 +9,14 @@ import com.parse.ParseUser;
 @ParseClassName("Challenge")
 public class Challenge extends ParseObject {
 
+    private static final String RESPONSE_STATUS_ACCEPTED = "accepted";
+    private static final String RESPONSE_STATUS_DECLINED = "declined";
+    private static final String RESPONSE_STATUS_UNKNOWN = "unknown";
+
+    public enum RESPONSE_STATUS {
+        ACCEPTED, DECLINED, UNKNOWN
+    }
+
     public Challenge() {
 
     }
@@ -53,12 +61,34 @@ public class Challenge extends ParseObject {
         put("ChallengeTitle", text);
     }
 
-    public boolean getIsAccepted() {
-        return getBoolean("isaccepted");
+    public RESPONSE_STATUS getResponseStatus() {
+        RESPONSE_STATUS stat = null;
+        String status = getString("responsestatus");
+        if (status.equals(RESPONSE_STATUS_ACCEPTED)) {
+            stat = RESPONSE_STATUS.ACCEPTED;
+        } else if (status.equals(RESPONSE_STATUS_DECLINED)) {
+            stat = RESPONSE_STATUS.DECLINED;
+        }
+        if (status.equals(RESPONSE_STATUS_UNKNOWN)) {
+            stat = RESPONSE_STATUS.UNKNOWN;
+        }
+        return stat;
     }
 
-    public void setIsAccepted(boolean status) {
-        put("isaccepted", status);
+    public void setResponseStatus(RESPONSE_STATUS status) {
+        String stat;
+        switch (status) {
+        case ACCEPTED:
+            stat = RESPONSE_STATUS_ACCEPTED;
+            break;
+        case DECLINED:
+            stat = RESPONSE_STATUS_DECLINED;
+            break;
+        default:
+            stat = RESPONSE_STATUS_UNKNOWN;
+            break;
+        }
+        put("responsestatus", stat);
     }
 
     public String getResponseText() {

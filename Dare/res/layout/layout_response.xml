@@ -22,21 +22,18 @@
             android:text="decline"/>"
     </LinearLayout>
     <LinearLayout 
-        android:id="@+id/linearlayoutAwaitingResponse"
+        android:id="@+id/linearlayoutResponse"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:visibility="gone">
            <TextView
-            android:id="@+id/textviewWaiting"
+            android:id="@+id/textviewResponseMessage"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Awaiting Response"/>
+            android:layout_height="wrap_content"/>
+           <FrameLayout
+            android:id="@+id/framelayoutResponseContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
     </LinearLayout>
-    <LinearLayout 
-        android:id="@+id/linearlayoutResponseContent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:visibility="gone"/>
 </RelativeLayout>
