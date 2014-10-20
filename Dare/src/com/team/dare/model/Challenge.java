@@ -1,7 +1,9 @@
 package com.team.dare.model;
 
+import com.parse.FindCallback;
 import com.parse.ParseClassName;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
 @ParseClassName("Challenge")
@@ -65,5 +67,15 @@ public class Challenge extends ParseObject {
 
     public void setResponseText(String text) {
         put("responsetext", text);
+    }
+
+    public static void getChallenge(String parseID,
+            FindCallback<Challenge> callback) {
+        ParseQuery<Challenge> query = new ParseQuery<Challenge>(Challenge.class)
+                .whereEqualTo("objectId", parseID);
+        query.include("UserFrom");
+        query.include("UserTo");
+        query.findInBackground(callback);
+
     }
 }

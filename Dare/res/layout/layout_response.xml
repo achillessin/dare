@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+    <LinearLayout 
+        android:id="@+id/linearlayoutAcceptDecline"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="visible">
+        <Button 
+            android:id="@+id/buttonAccept"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="accept"/>
+        <Button 
+            android:id="@+id/buttonDecline"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="decline"/>"
+    </LinearLayout>
+    <LinearLayout 
+        android:id="@+id/linearlayoutAwaitingResponse"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone">
+           <TextView
+            android:id="@+id/textviewWaiting"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Awaiting Response"/>
+    </LinearLayout>
+    <LinearLayout 
+        android:id="@+id/linearlayoutResponseContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone"/>
+</RelativeLayout>

@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:descendantFocusability="blocksDescendants">
 
     <include android:id="@+id/layoutChallengeContent" layout="@layout/layout_challenge_card_content"/>
     <include android:id="@+id/layoutChallengeFooter" layout="@layout/layout_challenge_card_footer"/>
