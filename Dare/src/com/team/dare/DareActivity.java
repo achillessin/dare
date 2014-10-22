@@ -1,4 +1,3 @@
-
 package com.team.dare;
 
 import android.content.Intent;
@@ -19,7 +18,7 @@ public class DareActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
 
         setupNavButtons();
-        switchContentFragment(new TimelineFragment());
+        switchToFragment(new TimelineAllFragment());
     }
 
     private void setupNavButtons() {
@@ -29,28 +28,30 @@ public class DareActivity extends FragmentActivity {
         createButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(DareActivity.this, CreateActivity.class));
+                startActivity(new Intent(DareActivity.this,
+                        CreateActivity.class));
             }
         });
 
-        homeButton.setOnClickListener(getNavOnClickListener(new TimelineFragment()));
-        profileButton.setOnClickListener(getNavOnClickListener(new ProfileFragment()));
+        homeButton
+                .setOnClickListener(getNavOnClickListener(new TimelineAllFragment()));
+        profileButton
+                .setOnClickListener(getNavOnClickListener(new ProfileFragment()));
     }
 
     private OnClickListener getNavOnClickListener(final Fragment fragment) {
         return new OnClickListener() {
             @Override
             public void onClick(View v) {
-                switchContentFragment(fragment);
+                switchToFragment(fragment);
             }
         };
     }
 
-    private void switchContentFragment(Fragment fragment) {
+    private void switchToFragment(Fragment fragment) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         transaction.replace(R.id.content_container, fragment);
         transaction.commit();
     }
-
 }

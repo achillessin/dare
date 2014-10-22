@@ -64,6 +64,10 @@ public class Challenge extends ParseObject {
     public RESPONSE_STATUS getResponseStatus() {
         RESPONSE_STATUS stat = null;
         String status = getString("responsestatus");
+        if (status == null) {
+            put("responsestatus", RESPONSE_STATUS_UNKNOWN);
+            return RESPONSE_STATUS.UNKNOWN;
+        }
         if (status.equals(RESPONSE_STATUS_ACCEPTED)) {
             stat = RESPONSE_STATUS.ACCEPTED;
         } else if (status.equals(RESPONSE_STATUS_DECLINED)) {
