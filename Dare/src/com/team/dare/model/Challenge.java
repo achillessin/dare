@@ -1,3 +1,4 @@
+
 package com.team.dare.model;
 
 import com.parse.FindCallback;
@@ -82,15 +83,15 @@ public class Challenge extends ParseObject {
     public void setResponseStatus(RESPONSE_STATUS status) {
         String stat;
         switch (status) {
-        case ACCEPTED:
-            stat = RESPONSE_STATUS_ACCEPTED;
-            break;
-        case DECLINED:
-            stat = RESPONSE_STATUS_DECLINED;
-            break;
-        default:
-            stat = RESPONSE_STATUS_UNKNOWN;
-            break;
+            case ACCEPTED:
+                stat = RESPONSE_STATUS_ACCEPTED;
+                break;
+            case DECLINED:
+                stat = RESPONSE_STATUS_DECLINED;
+                break;
+            default:
+                stat = RESPONSE_STATUS_UNKNOWN;
+                break;
         }
         put("responsestatus", stat);
     }
@@ -103,6 +104,14 @@ public class Challenge extends ParseObject {
         put("responsetext", text);
     }
 
+    public int getNumLikes() {
+        return getInt("numLikes");
+    }
+
+    public int getNumComments() {
+        return getInt("numComments");
+    }
+
     public static void getChallenge(String parseID,
             FindCallback<Challenge> callback) {
         ParseQuery<Challenge> query = new ParseQuery<Challenge>(Challenge.class)
@@ -110,6 +119,5 @@ public class Challenge extends ParseObject {
         query.include("UserFrom");
         query.include("UserTo");
         query.findInBackground(callback);
-
     }
 }

@@ -1,7 +1,5 @@
-package com.team.dare;
 
-import java.util.HashMap;
-import java.util.Map;
+package com.team.dare;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -14,8 +12,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.facebook.widget.ProfilePictureView;
-import com.parse.CountCallback;
-import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseQuery;
 import com.parse.ParseQueryAdapter;
@@ -26,9 +22,6 @@ import com.team.dare.model.Like;
 public class CustomTimelineAdapter extends ParseQueryAdapter<Challenge> {
 
     private ParseQuery<Challenge> mQuery;
-
-    private final Map<Challenge, View> challengeLayouts = new HashMap<Challenge, View>();
-    private final Map<View, Challenge> viewToChallenge = new HashMap<View, Challenge>();
 
     public CustomTimelineAdapter(Context context, final ParseQuery<Challenge> q) {
         super(context, new ParseQueryAdapter.QueryFactory<Challenge>() {
@@ -45,104 +38,52 @@ public class CustomTimelineAdapter extends ParseQueryAdapter<Challenge> {
     }
 
     @Override
-    public View getItemView(Challenge challenge, View layout, ViewGroup parent) {
-        if (layout == null) {
-            layout = View.inflate(getContext(),
+    public View getItemView(Challenge challenge, View convertView, ViewGroup parent) {
+        ViewHolder viewHolder;
+        if (convertView == null) {
+            convertView = View.inflate(getContext(),
                     R.layout.layout_challenge_card_content_footer, null);
+            viewHolder = new ViewHolder();
+            viewHolder.userFromImage = (ProfilePictureView) convertView
+                    .findViewById(R.id.imageUserFrom);
+            viewHolder.userToImage = (ProfilePictureView) convertView
+                    .findViewById(R.id.imageUserTo);
+            viewHolder.challengeTitleView = (TextView) convertView.findViewById(R.id.textviewTitle);
+            viewHolder.challengeTextView = (TextView) convertView
+                    .findViewById(R.id.textviewChallengeText);
+            viewHolder.numLikes = (TextView) convertView.findViewById(R.id.num_likes);
+            viewHolder.numComments = (TextView) convertView.findViewById(R.id.num_comments);
+            viewHolder.likeButton = (Button) convertView.findViewById(R.id.button_like);
+            viewHolder.commentButton = (Button) convertView.findViewById(R.id.button_comment);
+            viewHolder.shareButton = (Button) convertView.findViewById(R.id.button_share);
+            convertView.setTag(viewHolder);
         }
-        Challenge prevChallenge = viewToChallenge.get(layout);
-        if (prevChallenge != null) {
-            challengeLayouts.remove(prevChallenge);
+        else {
+            viewHolder = (ViewHolder) convertView.getTag();
         }
-        viewToChallenge.put(layout, challenge);
-        challengeLayouts.put(challenge, layout);
         try {
             challenge.fetchIfNeeded();
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         // get userfrom imageview
-        ProfilePictureView userFromImage = (ProfilePictureView) layout
-                .findViewById(R.id.imageUserFrom);
         String userFromFBID = challenge.getUserFrom().getString("facebookID");
-        userFromImage.setProfileId(userFromFBID);
-        // get userTo imageView
-        ProfilePictureView userToImage = (ProfilePictureView) layout
-                .findViewById(R.id.imageUserTo);
         String userToFBID = challenge.getUserTo().getString("facebookID");
-        userToImage.setProfileId(userToFBID);
-        // get challenge text view
-        TextView challengeTextView = (TextView) layout
-                .findViewById(R.id.textviewChallengeText);
-        challengeTextView.setText(challenge.getChallengeText().toString());
-        // get title
-        TextView challengeTitleView = (TextView) layout
-                .findViewById(R.id.textviewTitle);
-        challengeTitleView.setText(challenge.getChallengeTitle().toString());
+        viewHolder.userFromImage.setProfileId(userFromFBID);
+        viewHolder.userToImage.setProfileId(userToFBID);
+        viewHolder.challengeTitleView.setText(challenge.getChallengeTitle().toString());
+        viewHolder.challengeTextView.setText(challenge.getChallengeText().toString());
+        showNumFeedback(viewHolder.numLikes, challenge.getNumLikes(), "like");
+        showNumFeedback(viewHolder.numComments, challenge.getNumComments(), "comment");
 
-        // showLikes(challenge);
-        // showComments(challenge);
-        // setupLikeButton(challenge);
-        // setupCommentButton(challenge);
-        return layout;
+        setupLikeButton(viewHolder, challenge);
+        setupCommentButton(viewHolder, challenge);
+        return convertView;
     }
 
-    private void showLikes(final Challenge challenge) {
-        // get num likes for this challenge
-        Like.getNumChallengeLikes(challenge, new CountCallback() {
-            @Override
-            public void done(int count, ParseException e) {
-                View layout = challengeLayouts.get(challenge);
-                if (layout == null) {
-                    return;
-                }
-                TextView likesView = (TextView) layout
-                        .findViewById(R.id.num_likes);
-                showNumFeedback(likesView, count, "like");
-            }
-        });
-        // figure out if user liked this challenge
-        Like.getUserLikedChallenge(challenge, new GetCallback<Like>() {
-            @Override
-            public void done(Like like, ParseException e) {
-                View layout = challengeLayouts.get(challenge);
-                if (layout == null) {
-                    return;
-                }
-                Button likeButton = (Button) layout
-                        .findViewById(R.id.button_like);
-                if (like == null) {
-                    likeButton.setText(R.string.like);
-                } else {
-                    likeButton.setText(R.string.unlike);
-                }
-            }
-        });
-    }
-
-    private void showComments(final Challenge challenge) {
-        // get all comments for this challenge
-        Comment.getNumChallengeComments(challenge, new CountCallback() {
-            @Override
-            public void done(int count, ParseException e) {
-                View layout = challengeLayouts.get(challenge);
-                if (layout == null) {
-                    return;
-                }
-                TextView numCommentsView = (TextView) layout
-                        .findViewById(R.id.num_comments);
-                showNumFeedback(numCommentsView, count, "comment");
-            }
-        });
-    }
-
-    private void setupLikeButton(final Challenge challenge) {
-        View layout = challengeLayouts.get(challenge);
-        final Button likeButton = (Button) layout
-                .findViewById(R.id.button_like);
-        final TextView likesView = (TextView) layout
-                .findViewById(R.id.num_likes);
+    private void setupLikeButton(ViewHolder viewHolder, final Challenge challenge) {
+        final Button likeButton = viewHolder.likeButton;
+        final TextView likesView = viewHolder.numLikes;
         likeButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View button) {
@@ -163,22 +104,18 @@ public class CustomTimelineAdapter extends ParseQueryAdapter<Challenge> {
         });
     }
 
-    private void setupCommentButton(final Challenge challenge) {
-        View layout = challengeLayouts.get(challenge);
-        final Button commentButton = (Button) layout
-                .findViewById(R.id.button_comment);
+    private void setupCommentButton(final ViewHolder viewHolder, final Challenge challenge) {
+        final Button commentButton = viewHolder.commentButton;
         commentButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View button) {
-                promptComment(challenge);
+                promptComment(viewHolder, challenge);
             }
         });
     }
 
-    private void promptComment(final Challenge challenge) {
-        View layout = challengeLayouts.get(challenge);
-        final TextView commentView = (TextView) layout
-                .findViewById(R.id.num_comments);
+    private void promptComment(ViewHolder viewHolder, final Challenge challenge) {
+        final TextView commentView = viewHolder.numComments;
         AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
         alert.setTitle("Add a Comment");
         // Set an EditText view to get user input
@@ -218,5 +155,18 @@ public class CustomTimelineAdapter extends ParseQueryAdapter<Challenge> {
         int newVal = curr + (up ? 1 : -1);
         newVal = Math.max(newVal, 0);
         showNumFeedback(text, newVal, feedback);
+    }
+
+    static class ViewHolder {
+        ProfilePictureView userFromImage;
+        ProfilePictureView userToImage;
+        TextView challengeTitleView;
+        TextView challengeTextView;
+        TextView numLikes;
+        TextView numComments;
+        Button likeButton;
+        Button commentButton;
+        Button shareButton;
+
     }
 }
