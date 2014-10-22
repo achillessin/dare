@@ -1,4 +1,5 @@
 Parse.Cloud.afterSave("Comment", function(request) {
+  Parse.Cloud.useMasterKey();
   query = new Parse.Query("Challenge");
   query.get(request.object.get("Challenge").id, {
     success: function(challenge) {
@@ -12,6 +13,7 @@ Parse.Cloud.afterSave("Comment", function(request) {
 });
 
 Parse.Cloud.afterSave("Like", function(request) {
+  Parse.Cloud.useMasterKey();
   query = new Parse.Query("Challenge");
   query.get(request.object.get("Challenge").id, {
     success: function(challenge) {
@@ -25,6 +27,7 @@ Parse.Cloud.afterSave("Like", function(request) {
 });
 
 Parse.Cloud.afterDelete("Comment", function(request) {
+  Parse.Cloud.useMasterKey();
   query = new Parse.Query("Challenge");
   query.get(request.object.get("Challenge").id, {
     success: function(challenge) {
@@ -38,6 +41,7 @@ Parse.Cloud.afterDelete("Comment", function(request) {
 });
 
 Parse.Cloud.afterDelete("Like", function(request) {
+  Parse.Cloud.useMasterKey();
   query = new Parse.Query("Challenge");
   query.get(request.object.get("Challenge").id, {
     success: function(challenge) {
