@@ -46,10 +46,10 @@ public class CustomTimelineAdapter extends ParseQueryAdapter<Challenge> {
 
     @Override
     public View getItemView(Challenge challenge, View layout, ViewGroup parent) {
-        // if (layout == null) {
-        layout = View.inflate(getContext(),
-                R.layout.layout_challenge_card_content_footer, null);
-        // }
+        if (layout == null) {
+            layout = View.inflate(getContext(),
+                    R.layout.layout_challenge_card_content_footer, null);
+        }
         Challenge prevChallenge = viewToChallenge.get(layout);
         if (prevChallenge != null) {
             challengeLayouts.remove(prevChallenge);
