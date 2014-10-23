@@ -147,6 +147,8 @@ public class CreateActivity extends Activity {
             newChallenge.setChallengeText(challengeText);
             // set completed to false
             newChallenge.setCompleted(false);
+            // set response status to unknown
+            newChallenge.setResponseStatus(Challenge.RESPONSE_STATUS.UNKNOWN);
             // create acl
             ParseACL acl = new ParseACL();
             acl.setPublicReadAccess(true);

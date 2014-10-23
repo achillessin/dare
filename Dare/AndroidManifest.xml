@@ -55,6 +55,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.team.dare.DareActivity" />
         </activity>
+        <activity
+            android:name=".CreateResponseActivity"
+            android:label="@string/title_activity_create_response"
+            android:parentActivityName=".ChallengeExpandedActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.team.dare.ChallengeExpandedActivity" />
+        </activity>
     </application>
 
 </manifest>

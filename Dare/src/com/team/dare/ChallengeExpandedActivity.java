@@ -1,4 +1,3 @@
-
 package com.team.dare;
 
 import java.util.List;
@@ -7,6 +6,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -15,21 +16,27 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.facebook.widget.ProfilePictureView;
-import com.parse.CountCallback;
 import com.parse.FindCallback;
 import com.parse.ParseException;
+import com.parse.ParseFile;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.team.dare.model.Challenge;
 import com.team.dare.model.Comment;
+import com.team.dare.model.FileLoadSaveListener;
 import com.team.dare.model.Like;
+import com.team.dare.model.ResponseMedia;
 
 public class ChallengeExpandedActivity extends Activity {
 
     private static final String TAG = "ChallengeExpandedActivity";
     public static final String KEY_CHALLENGE_ID = "key.challenge.id";
+    ViewHolder viewHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,9 +58,19 @@ public class ChallengeExpandedActivity extends Activity {
                     finish();
                 }
                 // objectID is unique, so there should be only one object.
+                viewHolder = new ViewHolder();
+                viewHolder.userFromImage = (ProfilePictureView) findViewById(R.id.imageUserFrom);
+                viewHolder.userToImage = (ProfilePictureView) findViewById(R.id.imageUserTo);
+                viewHolder.challengeTitleView = (TextView) findViewById(R.id.textviewTitle);
+                viewHolder.challengeTextView = (TextView) findViewById(R.id.textviewChallengeText);
+                viewHolder.numLikes = (TextView) findViewById(R.id.num_likes);
+                viewHolder.numComments = (TextView) findViewById(R.id.num_comments);
+                viewHolder.likeButton = (Button) findViewById(R.id.button_like);
+                viewHolder.commentButton = (Button) findViewById(R.id.button_comment);
+                viewHolder.shareButton = (Button) findViewById(R.id.button_share);
                 Challenge c = objects.get(0);
-                loadChallengeCardContent(c);
-                loadChallengeCardFooter(c);
+                loadChallengeCardContent(viewHolder, c);
+                loadChallengeCardFooter(viewHolder, c);
                 loadChallengeCardResponse(c);
 
             }
@@ -62,37 +79,33 @@ public class ChallengeExpandedActivity extends Activity {
     }
 
     // load the challenge card content
-    private void loadChallengeCardContent(Challenge c) {
+    private void loadChallengeCardContent(ViewHolder viewHolder, Challenge c) {
         // get userfrom imageview
-        ProfilePictureView userFromImage = (ProfilePictureView) findViewById(R.id.imageUserFrom);
         String userFromFBID = c.getUserFrom().getString("facebookID");
-        userFromImage.setProfileId(userFromFBID);
+        viewHolder.userFromImage.setProfileId(userFromFBID);
         // get userTo imageView
-        ProfilePictureView userToImage = (ProfilePictureView) findViewById(R.id.imageUserTo);
         String userToFBID = c.getUserTo().getString("facebookID");
-        userToImage.setProfileId(userToFBID);
+        viewHolder.userToImage.setProfileId(userToFBID);
         // get challenge text view
-        TextView challengeTextView = (TextView) findViewById(R.id.textviewChallengeText);
-        challengeTextView.setText(c.getChallengeText().toString());
+        viewHolder.challengeTextView.setText(c.getChallengeText().toString());
         // get title
-        TextView challengeTitleView = (TextView) findViewById(R.id.textviewTitle);
-        challengeTitleView.setText(c.getChallengeTitle().toString());
+        viewHolder.challengeTitleView.setText(c.getChallengeTitle().toString());
     }
 
     // load the challenge card footer - comments, likes,
-    private void loadChallengeCardFooter(Challenge c) {
-        showLikes(c);
-        showComments(c);
-        setupLikeButton(c);
-        setupCommentButton(c);
+    private void loadChallengeCardFooter(ViewHolder viewHolder, Challenge c) {
+        showNumFeedback(viewHolder.numLikes, c.getNumLikes(), "like");
+        showNumFeedback(viewHolder.numComments, c.getNumComments(), "comment");
+        setupLikeButton(viewHolder, c);
+        setupCommentButton(viewHolder, c);
     }
 
     // load the challenge card response - whether accepted,declined, media if
     // uploaded, or option to respond
     private void loadChallengeCardResponse(final Challenge c) {
         // if userTo == currentuser
-        if (c.getUserTo().getObjectId() == ParseUser.getCurrentUser()
-                .getObjectId()) {
+        if (c.getUserTo().getObjectId()
+                .equals(ParseUser.getCurrentUser().getObjectId())) {
             // if challenge not accepted yet
             if (c.getResponseStatus() == Challenge.RESPONSE_STATUS.UNKNOWN) {
                 // show accept/decline buttons
@@ -120,6 +133,8 @@ public class ChallengeExpandedActivity extends Activity {
                 enableLayout(R.id.linearlayoutResponse);
                 ((TextView) findViewById(R.id.textviewResponseMessage))
                         .setText("Accepted");
+                // load media if any
+                loadChallengeResponseMedia(c);
             } else if (c.getResponseStatus() == Challenge.RESPONSE_STATUS.DECLINED) {
                 // show declined message
                 enableLayout(R.id.linearlayoutResponse);
@@ -147,6 +162,70 @@ public class ChallengeExpandedActivity extends Activity {
         }
     }
 
+    // function to load the response media
+    private void loadChallengeResponseMedia(final Challenge c) {
+        final FrameLayout containerLayout = (FrameLayout) findViewById(R.id.framelayoutResponseContent);
+        // add the challenge response text if any
+        TextView tv = new TextView(ChallengeExpandedActivity.this);
+        String challengeResponseText = c.getResponseText();
+        tv.setText(challengeResponseText);
+        // add to framelayout
+        containerLayout.addView(tv);
+
+        ParseQuery<ResponseMedia> query = new ParseQuery<ResponseMedia>(
+                ResponseMedia.class);
+        query.whereEqualTo("Challenge", c);
+        query.findInBackground(new FindCallback<ResponseMedia>() {
+
+            @Override
+            public void done(List<ResponseMedia> objects, ParseException e) {
+                for (int i = 0; i < objects.size(); i++) {
+                    // get the thumbnails if any
+                    ParseFile thumbnail = objects.get(i).getFileThumbnail();
+                    ImageView iv = new ImageView(ChallengeExpandedActivity.this);
+                    // display
+                    displayImage(thumbnail, iv);
+                    // add to framelayout
+                    containerLayout.addView(iv);
+                }
+            }
+        });
+    }
+
+    private void displayImage(final ParseFile f, final ImageView v) {
+        ResponseMedia.getFileFromServerHelper(f, new FileLoadSaveListener() {
+
+            @Override
+            public void onLoadDone(byte[] data) {
+                Bitmap bmp = BitmapFactory
+                        .decodeByteArray(data, 0, data.length);
+                if (bmp != null) {
+                    Log.e(TAG, "Thumbnail downloaded and set to imageview");
+                    v.setImageBitmap(bmp);
+                }
+            }
+
+            @Override
+            public void onProgress(int percentageDone) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onError(ParseException e) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void onSaveDone() {
+                // DO NOTHING
+
+            }
+
+        });
+    }
+
     // helper function to enable one layout in layout_response and disable all
     // others
     private void enableLayout(int layoutID) {
@@ -156,41 +235,10 @@ public class ChallengeExpandedActivity extends Activity {
         findViewById(layoutID).setVisibility(View.VISIBLE);
     }
 
-    private void showLikes(final Challenge challenge) {
-        // get all likes for this challenge
-        Like.getChallengeLikes(challenge, new FindCallback<Like>() {
-            @Override
-            public void done(List<Like> likes, ParseException e) {
-                Button likeButton = (Button) findViewById(R.id.button_like);
-                TextView likesView = (TextView) findViewById(R.id.num_likes);
-                // show number of likes
-                showNumFeedback(likesView, likes.size(), "like");
-                // set like button action
-                likeButton.setText(R.string.like);
-                for (Like like : likes) {
-                    if (like.getUser().hasSameId(ParseUser.getCurrentUser())) {
-                        likeButton.setText(R.string.unlike);
-                        break;
-                    }
-                }
-            }
-        });
-    }
-
-    private void showComments(final Challenge challenge) {
-        // get all comments for this challenge
-        Comment.getNumChallengeComments(challenge, new CountCallback() {
-            @Override
-            public void done(int count, ParseException e) {
-                TextView numCommentsView = (TextView) findViewById(R.id.num_comments);
-                showNumFeedback(numCommentsView, count, "comment");
-            }
-        });
-    }
-
-    private void setupLikeButton(final Challenge challenge) {
-        final Button likeButton = (Button) findViewById(R.id.button_like);
-        final TextView likesView = (TextView) findViewById(R.id.num_likes);
+    private void setupLikeButton(ViewHolder viewHolder,
+            final Challenge challenge) {
+        final Button likeButton = viewHolder.likeButton;
+        final TextView likesView = viewHolder.numLikes;
         likeButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View button) {
@@ -211,18 +259,19 @@ public class ChallengeExpandedActivity extends Activity {
         });
     }
 
-    private void setupCommentButton(final Challenge challenge) {
-        final Button commentButton = (Button) findViewById(R.id.button_comment);
+    private void setupCommentButton(final ViewHolder viewHolder,
+            final Challenge challenge) {
+        final Button commentButton = viewHolder.commentButton;
         commentButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View button) {
-                promptComment(challenge);
+                promptComment(viewHolder, challenge);
             }
         });
     }
 
-    private void promptComment(final Challenge challenge) {
-        final TextView commentView = (TextView) findViewById(R.id.num_comments);
+    private void promptComment(ViewHolder viewHolder, final Challenge challenge) {
+        final TextView commentView = viewHolder.numComments;
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("Add a Comment");
         // Set an EditText view to get user input
@@ -262,6 +311,19 @@ public class ChallengeExpandedActivity extends Activity {
         int newVal = curr + (up ? 1 : -1);
         newVal = Math.max(newVal, 0);
         showNumFeedback(text, newVal, feedback);
+    }
+
+    static class ViewHolder {
+        ProfilePictureView userFromImage;
+        ProfilePictureView userToImage;
+        TextView challengeTitleView;
+        TextView challengeTextView;
+        TextView numLikes;
+        TextView numComments;
+        Button likeButton;
+        Button commentButton;
+        Button shareButton;
+
     }
 
     @Override

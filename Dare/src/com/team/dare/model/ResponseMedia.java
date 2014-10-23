@@ -30,6 +30,14 @@ public class ResponseMedia extends ParseObject {
         put("Challenge", c);
     }
 
+    public void setFileThumbnail(ParseFile f) {
+        put("thumbnail", f);
+    }
+
+    public ParseFile getFileThumbnail() {
+        return getParseFile("thumbnail");
+    }
+
     public FILE_TYPE getFileType() {
         String type = getString("filetype");
         if (type.equals(FILE_TYPE_IMAGE)) {
@@ -64,7 +72,7 @@ public class ResponseMedia extends ParseObject {
         put("file", f);
     }
 
-    public void saveFileToServerHelper(byte[] fileData, String filename,
+    static public void saveFileToServerHelper(byte[] fileData, String filename,
             final FileLoadSaveListener listener) {
         ParseFile file = null;
         file = new ParseFile(filename, fileData);
@@ -85,7 +93,7 @@ public class ResponseMedia extends ParseObject {
         }
     }
 
-    public void getFileFromServerHelper(ParseFile file,
+    static public void getFileFromServerHelper(ParseFile file,
             final FileLoadSaveListener listener) {
         file.getDataInBackground(new GetDataCallback() {
 

@@ -18,5 +18,6 @@
     <string name="like">like</string>
     <string name="unlike">unlike</string>
     <string name="title_activity_challenge_expanded">ChallengeExpandedActivity</string>
+    <string name="title_activity_create_response">CreateResponseActivity</string>
 
 </resources>
