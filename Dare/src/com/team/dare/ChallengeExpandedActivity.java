@@ -18,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.facebook.widget.ProfilePictureView;
@@ -72,7 +73,7 @@ public class ChallengeExpandedActivity extends Activity {
                 loadChallengeCardContent(viewHolder, c);
                 loadChallengeCardFooter(viewHolder, c);
                 loadChallengeCardResponse(c);
-
+                loadChallengeComments(c);
             }
 
         });
@@ -190,6 +191,19 @@ public class ChallengeExpandedActivity extends Activity {
                 }
             }
         });
+    }
+
+    private void loadChallengeComments(Challenge challenge) {
+        final ListView commentsView = (ListView) findViewById(R.id.comments_list);
+        Comment.getChallengeComments(challenge, new FindCallback<Comment>() {
+            @Override
+            public void done(List<Comment> comments, ParseException e) {
+                CommentAdapter adapter = new CommentAdapter(
+                        ChallengeExpandedActivity.this, 0, comments);
+                commentsView.setAdapter(adapter);
+            }
+        });
+
     }
 
     private void displayImage(final ParseFile f, final ImageView v) {
