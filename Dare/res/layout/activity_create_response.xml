@@ -28,17 +28,40 @@
     <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_alignParentBottom="true"
-    android:orientation="horizontal">
-        <ImageView
+    android:orientation="horizontal"
+    android:layout_above="@+id/linearlayoutButtons">
+        <ImageButton
         android:id="@+id/buttonLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_location"/>
-    <ImageView
+        android:src="@drawable/ic_location"
+        android:onClick="onGetGeoLocation"/>
+        <ImageButton
         android:id="@+id/buttonMedia"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_camera"/>
+        android:src="@drawable/ic_camera"
+        android:onClick="onGetMedia"/>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@id/linearlayoutButtons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+        <Button 
+            android:id="@+id/buttonSave"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            android:onClick="onSave"/>
+        <Button 
+            android:id="@+id/buttonCancel"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Cancel"
+            android:onClick="onCancel"/>"
     </LinearLayout>
 </RelativeLayout>
