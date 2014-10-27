@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -37,6 +38,8 @@ public class ChallengeExpandedActivity extends Activity {
 
     private static final String TAG = "ChallengeExpandedActivity";
     public static final String KEY_CHALLENGE_ID = "key.challenge.id";
+    // challenge id of the current challenge.
+    private String mChallengeID;
     ViewHolder viewHolder;
 
     @Override
@@ -45,12 +48,12 @@ public class ChallengeExpandedActivity extends Activity {
         setContentView(R.layout.activity_challenge_expanded);
 
         Intent intent = getIntent();
-        String challengeID = intent.getStringExtra(KEY_CHALLENGE_ID);
-        if (challengeID == null) {
+        mChallengeID = intent.getStringExtra(KEY_CHALLENGE_ID);
+        if (mChallengeID == null) {
             Log.e(TAG, "No challenge id provided in the intent.");
             finish();
         }
-        Challenge.getChallenge(challengeID, new FindCallback<Challenge>() {
+        Challenge.getChallenge(mChallengeID, new FindCallback<Challenge>() {
 
             @Override
             public void done(List<Challenge> objects, ParseException e) {
@@ -133,7 +136,7 @@ public class ChallengeExpandedActivity extends Activity {
                 // show accepted sign, and content if any
                 enableLayout(R.id.linearlayoutResponse);
                 ((TextView) findViewById(R.id.textviewResponseMessage))
-                        .setText("Accepted");
+                        .setText("Accepted(Tap to respond)");
                 // load media if any
                 loadChallengeResponseMedia(c);
             } else if (c.getResponseStatus() == Challenge.RESPONSE_STATUS.DECLINED) {
@@ -154,6 +157,7 @@ public class ChallengeExpandedActivity extends Activity {
                 enableLayout(R.id.linearlayoutResponse);
                 ((TextView) findViewById(R.id.textviewResponseMessage))
                         .setText("Accepted");
+                loadChallengeResponseMedia(c);
             } else if (c.getResponseStatus() == Challenge.RESPONSE_STATUS.DECLINED) {
                 // show declined message
                 enableLayout(R.id.linearlayoutResponse);
@@ -163,6 +167,15 @@ public class ChallengeExpandedActivity extends Activity {
         }
     }
 
+    public void onRespond(View v) {
+        // get challenge Id put in intent
+        Intent intent = new Intent(ChallengeExpandedActivity.this,
+                CreateResponseActivity.class);
+        intent.putExtra(CreateResponseActivity.KEY_CHALLENGE_ID, mChallengeID);
+        // start activity
+        startActivity(intent);
+    }
+
     // function to load the response media
     private void loadChallengeResponseMedia(final Challenge c) {
         final FrameLayout containerLayout = (FrameLayout) findViewById(R.id.framelayoutResponseContent);
@@ -170,6 +183,8 @@ public class ChallengeExpandedActivity extends Activity {
         TextView tv = new TextView(ChallengeExpandedActivity.this);
         String challengeResponseText = c.getResponseText();
         tv.setText(challengeResponseText);
+        tv.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
+                LayoutParams.WRAP_CONTENT));
         // add to framelayout
         containerLayout.addView(tv);
 
@@ -184,10 +199,11 @@ public class ChallengeExpandedActivity extends Activity {
                     // get the thumbnails if any
                     ParseFile thumbnail = objects.get(i).getFileThumbnail();
                     ImageView iv = new ImageView(ChallengeExpandedActivity.this);
+                    iv.setLayoutParams(new LayoutParams(
+                            LayoutParams.WRAP_CONTENT,
+                            LayoutParams.WRAP_CONTENT));
                     // display
-                    displayImage(thumbnail, iv);
-                    // add to framelayout
-                    containerLayout.addView(iv);
+                    displayImage(thumbnail, iv, containerLayout);
                 }
             }
         });
@@ -206,7 +222,8 @@ public class ChallengeExpandedActivity extends Activity {
 
     }
 
-    private void displayImage(final ParseFile f, final ImageView v) {
+    private void displayImage(final ParseFile f, final ImageView v,
+            final FrameLayout layout) {
         ResponseMedia.getFileFromServerHelper(f, new FileLoadSaveListener() {
 
             @Override
@@ -216,6 +233,7 @@ public class ChallengeExpandedActivity extends Activity {
                 if (bmp != null) {
                     Log.e(TAG, "Thumbnail downloaded and set to imageview");
                     v.setImageBitmap(bmp);
+                    layout.addView(v);
                 }
             }
 

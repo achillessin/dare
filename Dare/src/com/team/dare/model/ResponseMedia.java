@@ -72,10 +72,8 @@ public class ResponseMedia extends ParseObject {
         put("file", f);
     }
 
-    static public void saveFileToServerHelper(byte[] fileData, String filename,
+    static public void saveFileToServerHelper(ParseFile file,
             final FileLoadSaveListener listener) {
-        ParseFile file = null;
-        file = new ParseFile(filename, fileData);
         if (file != null) {
             file.saveInBackground(new SaveCallback() {
                 @Override
