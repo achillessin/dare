@@ -6,8 +6,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -17,20 +15,20 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.facebook.widget.ProfilePictureView;
 import com.parse.FindCallback;
+import com.parse.GetDataCallback;
 import com.parse.ParseException;
 import com.parse.ParseFile;
+import com.parse.ParseImageView;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.team.dare.model.Challenge;
 import com.team.dare.model.Comment;
-import com.team.dare.model.FileLoadSaveListener;
 import com.team.dare.model.Like;
 import com.team.dare.model.ResponseMedia;
 
@@ -178,14 +176,14 @@ public class ChallengeExpandedActivity extends Activity {
 
     // function to load the response media
     private void loadChallengeResponseMedia(final Challenge c) {
-        final FrameLayout containerLayout = (FrameLayout) findViewById(R.id.framelayoutResponseContent);
+        final LinearLayout containerLayout = (LinearLayout) findViewById(R.id.linearlayoutResponseMedia);
         // add the challenge response text if any
         TextView tv = new TextView(ChallengeExpandedActivity.this);
         String challengeResponseText = c.getResponseText();
         tv.setText(challengeResponseText);
         tv.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT,
                 LayoutParams.WRAP_CONTENT));
-        // add to framelayout
+        // add to LinearLayout
         containerLayout.addView(tv);
 
         ParseQuery<ResponseMedia> query = new ParseQuery<ResponseMedia>(
@@ -198,12 +196,8 @@ public class ChallengeExpandedActivity extends Activity {
                 for (int i = 0; i < objects.size(); i++) {
                     // get the thumbnails if any
                     ParseFile thumbnail = objects.get(i).getFileThumbnail();
-                    ImageView iv = new ImageView(ChallengeExpandedActivity.this);
-                    iv.setLayoutParams(new LayoutParams(
-                            LayoutParams.WRAP_CONTENT,
-                            LayoutParams.WRAP_CONTENT));
                     // display
-                    displayImage(thumbnail, iv, containerLayout);
+                    displayImage(thumbnail, containerLayout);
                 }
             }
         });
@@ -222,39 +216,16 @@ public class ChallengeExpandedActivity extends Activity {
 
     }
 
-    private void displayImage(final ParseFile f, final ImageView v,
-            final FrameLayout layout) {
-        ResponseMedia.getFileFromServerHelper(f, new FileLoadSaveListener() {
+    private void displayImage(final ParseFile f, final LinearLayout layout) {
+        final ParseImageView imageView = new ParseImageView(this);
 
+        imageView.setParseFile(f);
+        layout.addView(imageView);
+
+        imageView.loadInBackground(new GetDataCallback() {
             @Override
-            public void onLoadDone(byte[] data) {
-                Bitmap bmp = BitmapFactory
-                        .decodeByteArray(data, 0, data.length);
-                if (bmp != null) {
-                    Log.e(TAG, "Thumbnail downloaded and set to imageview");
-                    v.setImageBitmap(bmp);
-                    layout.addView(v);
-                }
+            public void done(byte[] data, ParseException e) {
             }
-
-            @Override
-            public void onProgress(int percentageDone) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void onError(ParseException e) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void onSaveDone() {
-                // DO NOTHING
-
-            }
-
         });
     }
 
