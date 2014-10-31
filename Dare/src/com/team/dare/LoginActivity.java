@@ -1,3 +1,4 @@
+
 package com.team.dare;
 
 import java.util.Arrays;
@@ -21,6 +22,7 @@ import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
+import com.team.dare.model.FacebookInfo;
 
 public class LoginActivity extends Activity {
 
@@ -80,19 +82,21 @@ public class LoginActivity extends Activity {
                 if (user == null) {
                     Log.d(DareApplication.TAG,
                             "Uh oh. The user cancelled the Facebook login.");
-                } else if (user.isNew()) {
+                } else if (user.isNew() || user.get("facebookInfo") == null) {
                     Log.d(DareApplication.TAG,
                             "User signed up and logged in through Facebook!");
                     Request request = Request.newMeRequest(
                             ParseFacebookUtils.getSession(),
                             new Request.GraphUserCallback() {
-
                                 @Override
                                 public void onCompleted(GraphUser guser,
                                         Response gresponse) {
                                     LoginActivity.this.mProgressDialog
                                             .dismiss();
                                     user.put("facebookID", guser.getId());
+                                    FacebookInfo fbInfo = new FacebookInfo();
+                                    fbInfo.initialize(guser);
+                                    user.put("facebookInfo", fbInfo);
                                     user.saveEventually();
                                     goToDareActivity();
                                 }
