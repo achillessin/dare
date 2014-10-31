@@ -1,8 +1,10 @@
+
 package com.team.dare.model;
 
 import com.parse.CountCallback;
 import com.parse.FindCallback;
 import com.parse.ParseClassName;
+import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
@@ -33,6 +35,22 @@ public class Comment extends ParseObject {
 
     public String getText() {
         return getString("Text");
+    }
+
+    public String getAuthor() {
+        FacebookInfo fbInfo = (FacebookInfo) getUser().getParseObject("facebookInfo");
+        if (fbInfo == null) {
+            return "Unknown User";
+        }
+        try {
+            fbInfo = fbInfo.fetchIfNeeded();
+            String firstName = fbInfo.getString("firstName");
+            String lastName = fbInfo.getString("lastName");
+            return firstName + " " + lastName;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return "Unknown User";
     }
 
     public static void getChallengeComments(Challenge challenge,

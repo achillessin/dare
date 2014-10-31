@@ -1,3 +1,4 @@
+
 package com.team.dare;
 
 import java.util.List;
@@ -42,8 +43,7 @@ public class CommentAdapter extends ArrayAdapter<Comment> {
         } else {
             commentHolder = (CommentHolder) convertView.getTag();
         }
-        commentHolder.author.setText(mComments.get(position).getUser()
-                .getUsername());
+        commentHolder.author.setText(mComments.get(position).getAuthor());
         commentHolder.comment.setText(mComments.get(position).getText());
         String profileId = mComments.get(position).getUser()
                 .getString("facebookID");
